@@ -89,6 +89,20 @@
       box-shadow: 0 6px 13px rgba(82, 81, 211, .24);
     }
     .btn-print:hover { filter: brightness(1.06); transform: translateY(-1px); }
+    .action-buttons { display: flex; gap: 7px; }
+    .btn-pdf, .btn-share {
+      height: 38px;
+      padding: 0 13px;
+      border: 0;
+      border-radius: 10px;
+      color: white;
+      font: 700 11px var(--font);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .btn-pdf { background: linear-gradient(135deg, #d94761, #b52b4b); }
+    .btn-share { background: linear-gradient(135deg, #129a83, #087a71); }
+    .btn-pdf:hover, .btn-share:hover { filter: brightness(1.07); transform: translateY(-1px); }
 
     .a4-page {
       width: 210mm;
@@ -117,6 +131,14 @@
       background: linear-gradient(135deg, #fff 0%, var(--soft) 100%);
       break-inside: avoid;
     }
+    .sticker.shape-soft { border-radius: 8mm 3mm 8mm 3mm; }
+    .sticker.shape-ticket { border-radius: 3mm; border-style: dashed; }
+    .sticker.shape-wave { border-radius: 8mm 8mm 3mm 8mm; }
+    .sticker.shape-pill { border-radius: 8mm; }
+    .sticker.shape-soft::before { height: 10px; border-radius: 0 0 10px 0; }
+    .sticker.shape-ticket::before { height: 5px; }
+    .sticker.shape-wave::before { height: 14px; clip-path: polygon(0 0,100% 0,100% 55%,85% 100%,70% 55%,55% 100%,40% 55%,25% 100%,10% 55%,0 100%); }
+    .sticker.shape-pill::before { height: 8px; left: 12mm; right: 12mm; border-radius: 0 0 10px 10px; }
     .sticker::before {
       content: "";
       position: absolute;
@@ -251,7 +273,11 @@
     <div class="control-group"><label for="gradeInput">الصف</label><input id="gradeInput" type="text" placeholder="مثال: الرابع أ"></div>
     <div class="control-group"><label for="schoolInput">المدرسة</label><input id="schoolInput" type="text" placeholder="اكتب اسم المدرسة"></div>
     <div class="control-group"><label for="decorationMode">زخرفة الملصقات</label><select id="decorationMode" aria-label="اختيار زخرفة الملصقات"><option value="girls">بنات — ورود</option><option value="boys">ذكور — موتورات وسيارات</option></select></div>
-    <button class="btn-print" type="button" onclick="window.print()">طباعة الملصقات</button>
+    <div class="action-buttons">
+      <button class="btn-print" type="button" onclick="window.print()">طباعة</button>
+      <button class="btn-pdf" type="button" id="downloadPdf">PDF</button>
+      <button class="btn-share" type="button" id="sharePdf">مشاركة</button>
+    </div>
   </section>
 
   <main class="a4-page girls" id="stickerPage">
@@ -265,7 +291,54 @@
     <article class="sticker theme-history"><div class="sticker-header"><div class="subject-title"><svg class="subject-icon" viewBox="0 0 24 24"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>التاريخ</div><span class="subject-tag">قصص وحضارات</span></div><div class="sticker-body"><div class="student-info"><div class="info-row"><b class="info-label">الاسم</b><span class="info-line name-slot"></span></div><div class="info-row"><b class="info-label">الصف</b><span class="info-line grade-slot"></span></div><div class="info-row"><b class="info-label">المدرسة</b><span class="info-line school-slot"></span></div></div><div class="child-photo-wrapper"><img class="child-photo" hidden alt="صورة الطالب"><span class="photo-placeholder">صورة الطالب</span></div></div></article>
   </main>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
+    const stickerPage = document.getElementById('stickerPage');
+    const shapeNames = ['shape-soft', 'shape-ticket', 'shape-wave', 'shape-pill'];
+    document.querySelectorAll('.sticker').forEach((sticker, index) => {
+      sticker.classList.add(shapeNames[Math.floor(Math.random() * shapeNames.length)]);
+    });
+
+    async function createPdfFile() {
+      if (!window.html2canvas || !window.jspdf) {
+        alert('تعذر تحميل أدوات PDF. استخدم زر الطباعة واختر حفظ بصيغة PDF.');
+        return null;
+      }
+      const canvas = await html2canvas(stickerPage, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+      pdf.addImage(canvas.toDataURL('image/jpeg', .95), 'JPEG', 0, 0, 210, 297);
+      return new File([pdf.output('blob')], 'ملصقات-مدرسية.pdf', { type: 'application/pdf' });
+    }
+
+    document.getElementById('downloadPdf').addEventListener('click', async () => {
+      const file = await createPdfFile();
+      if (!file) return;
+      const url = URL.createObjectURL(file);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = file.name;
+      link.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    });
+
+    document.getElementById('sharePdf').addEventListener('click', async () => {
+      const file = await createPdfFile();
+      if (!file) return;
+      if (navigator.share && (!navigator.canShare || navigator.canShare({ files: [file] }))) {
+        await navigator.share({ title: 'ملصقات مدرسية', text: 'ملف الملصقات المدرسية', files: [file] });
+      } else {
+        const url = URL.createObjectURL(file);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = file.name;
+        link.click();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        alert('المشاركة المباشرة غير مدعومة في هذا المتصفح، لذلك تم تنزيل ملف PDF.');
+      }
+    });
+
     const syncInput = (id, slot) => document.getElementById(id).addEventListener('input', event => {
       document.querySelectorAll('.' + slot).forEach(el => el.textContent = event.target.value);
     });
