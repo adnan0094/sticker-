@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ملصقات مدرسية أنيقة A4</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #172033;
+      --muted: #667085;
+      --paper: #ffffff;
+      --workspace: #edf1f7;
+      --line: #d9e0ea;
+      --font: "Cairo", "Tahoma", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      padding: 24px;
+      background: linear-gradient(135deg, #eef2f8, #e4ebf5);
+      color: var(--ink);
+      font-family: var(--font);
+    }
+
+    .control-panel {
+      width: 210mm;
+      margin: 0 auto 22px;
+      padding: 18px 22px;
+      display: grid;
+      grid-template-columns: 1.1fr 1fr 1fr 1.25fr 1fr auto;
+      gap: 12px;
+      align-items: end;
+      background: rgba(255,255,255,.94);
+      border: 1px solid rgba(255,255,255,.8);
+      border-radius: 18px;
+      box-shadow: 0 14px 35px rgba(42, 60, 90, .12);
+    }
+    .panel-title {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 2px;
+      color: #20304d;
+      font-size: 18px;
+      font-weight: 800;
+    }
+    .panel-title span {
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 11px;
+      color: white;
+      background: linear-gradient(135deg, #5468f2, #7c4dce);
+      font-size: 17px;
+    }
+    .control-group { display: flex; flex-direction: column; gap: 5px; }
+    .control-group label { color: #475467; font-size: 12px; font-weight: 700; }
+    .control-group input,
+    .control-group select {
+      width: 100%;
+      height: 38px;
+      padding: 0 11px;
+      border: 1px solid #d6deea;
+      border-radius: 10px;
+      outline: none;
+      background: #fbfcfe;
+      color: var(--ink);
+      font: 600 12px var(--font);
+    }
+    .control-group input:focus,
+    .control-group select:focus { border-color: #6978ef; box-shadow: 0 0 0 3px rgba(105,120,239,.13); }
+    .btn-print {
+      height: 38px;
+      padding: 0 18px;
+      border: 0;
+      border-radius: 10px;
+      color: white;
+      background: linear-gradient(135deg, #4b61e8, #7646c5);
+      font: 700 12px var(--font);
+      cursor: pointer;
+      white-space: nowrap;
+      box-shadow: 0 6px 13px rgba(82, 81, 211, .24);
+    }
+    .btn-print:hover { filter: brightness(1.06); transform: translateY(-1px); }
+
+    .a4-page {
+      width: 210mm;
+      height: 297mm;
+      margin: auto;
+      padding: 7mm;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: repeat(4, 1fr);
+      gap: 4mm;
+      background: var(--paper);
+      box-shadow: 0 18px 45px rgba(42, 60, 90, .18);
+    }
+
+    .sticker {
+      --color: #5265e8;
+      --soft: #eef0ff;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      padding: 4.5mm;
+      border: 1px solid color-mix(in srgb, var(--color) 35%, #fff);
+      border-radius: 5mm;
+      background: linear-gradient(135deg, #fff 0%, var(--soft) 100%);
+      break-inside: avoid;
+    }
+    .sticker::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto;
+      height: 7px;
+      background: var(--color);
+    }
+    .sticker::after {
+      content: "";
+      position: absolute;
+      width: 45mm;
+      height: 45mm;
+      left: -20mm;
+      bottom: -25mm;
+      border-radius: 50%;
+      background: var(--color);
+      opacity: .07;
+    }
+    .a4-page.girls .sticker::after,
+    .a4-page.boys .sticker::after {
+      width: auto;
+      height: auto;
+      left: 3mm;
+      bottom: 2mm;
+      border-radius: 0;
+      background: transparent;
+      opacity: .9;
+      font-size: 22px;
+      letter-spacing: 2px;
+      transform: rotate(-8deg);
+      filter: saturate(1.08);
+    }
+    .a4-page.girls .sticker::after { content: "🌸  🌼"; }
+    .a4-page.boys .sticker::after { content: "🏍️  🚗"; }
+    .sticker-header {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      padding: 2mm 0 2.4mm;
+      border-bottom: 1px solid color-mix(in srgb, var(--color) 25%, #fff);
+    }
+    .subject-title { display: flex; align-items: center; gap: 7px; color: var(--color); font-size: 15px; font-weight: 800; }
+    .subject-icon {
+      width: 25px;
+      height: 25px;
+      padding: 5px;
+      border-radius: 9px;
+      fill: var(--color);
+      background: color-mix(in srgb, var(--color) 13%, #fff);
+    }
+    .subject-tag {
+      padding: 3px 7px;
+      border-radius: 999px;
+      color: var(--color);
+      background: color-mix(in srgb, var(--color) 11%, #fff);
+      font-size: 9px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .sticker-body {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex: 1;
+      align-items: center;
+      gap: 8mm;
+      padding-top: 4mm;
+    }
+    .student-info { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 6mm; min-width: 0; }
+    .info-row { display: flex; align-items: end; gap: 5px; min-width: 0; font-size: 11px; font-weight: 700; }
+    .info-label { flex: 0 0 auto; color: var(--color); font-weight: 800; }
+    .info-line {
+      flex: 1;
+      min-width: 0;
+      height: 19px;
+      padding: 0 3px;
+      overflow: hidden;
+      border-bottom: 1.5px dashed color-mix(in srgb, var(--color) 50%, #8c96a8);
+      color: #182338;
+      font-size: 10px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .child-photo-wrapper {
+      position: relative;
+      flex: 0 0 31mm;
+      width: 31mm;
+      height: 36mm;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid var(--color);
+      border-radius: 4mm;
+      background: rgba(255,255,255,.7);
+      box-shadow: 0 3px 10px rgba(35, 50, 80, .08);
+    }
+    .child-photo { width: 100%; height: 100%; object-fit: cover; object-position: top center; }
+    .photo-placeholder { padding: 4px; color: color-mix(in srgb, var(--color) 65%, #667085); text-align: center; font-size: 9px; font-weight: 700; line-height: 1.5; }
+    .photo-placeholder::before { content: "✦"; display: block; margin-bottom: 2px; color: var(--color); font-size: 17px; }
+
+    .theme-arabic { --color:#2f62c9; --soft:#edf4ff; }
+    .theme-english { --color:#8651c8; --soft:#f6efff; }
+    .theme-math { --color:#23936a; --soft:#ebfbf3; }
+    .theme-science { --color:#e27631; --soft:#fff5eb; }
+    .theme-social { --color:#795846; --soft:#f8f2ee; }
+    .theme-art { --color:#0b9caa; --soft:#eafcff; }
+    .theme-geography { --color:#19877e; --soft:#ebfaf7; }
+    .theme-history { --color:#c24f7d; --soft:#fff0f5; }
+
+    @page { size: A4 portrait; margin: 0; }
+    @media (max-width: 850px) {
+      body { padding: 10px; overflow-x: auto; }
+      .control-panel { grid-template-columns: repeat(2, minmax(145px, 1fr)); width: 210mm; }
+      .panel-title { grid-column: 1 / -1; }
+    }
+    @media print {
+      body { padding: 0; background: transparent; }
+      .control-panel { display: none !important; }
+      .a4-page { margin: 0; box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+  <section class="control-panel" aria-label="بيانات الملصقات">
+    <div class="panel-title"><span>✦</span> ملصقاتي المدرسية <small>— املأ البيانات ثم اطبع</small></div>
+    <div class="control-group"><label for="imageInput">صورة الطالب</label><input id="imageInput" type="file" accept="image/*"></div>
+    <div class="control-group"><label for="nameInput">اسم الطالب</label><input id="nameInput" type="text" placeholder="اكتب الاسم"></div>
+    <div class="control-group"><label for="gradeInput">الصف</label><input id="gradeInput" type="text" placeholder="مثال: الرابع أ"></div>
+    <div class="control-group"><label for="schoolInput">المدرسة</label><input id="schoolInput" type="text" placeholder="اكتب اسم المدرسة"></div>
+    <div class="control-group"><label for="decorationMode">زخرفة الملصقات</label><select id="decorationMode" aria-label="اختيار زخرفة الملصقات"><option value="girls">بنات — ورود</option><option value="boys">ذكور — موتورات وسيارات</option></select></div>
+    <button class="btn-print" type="button" onclick="window.print()">طباعة الملصقات</button>
+  </section>
+
+  <main class="a4-page girls" id="stickerPage">
+    <article class="sticker theme-arabic"><div class="sticker-header"><div class="subject-title"><svg class="subject-icon" viewBox="0 0 24 24"><path d="M19 2H5c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 16H6V4h12v14zm-9-4l5-3-5-3v6z"/></svg>اللغة العربية</div><span class="subject-tag">كتب وقلم</span></div><div class="sticker-body"><div class="student-info"><div class="info-row"><b class="info-label">الاسم</b><span class="info-line name-slot"></span></div><div class="info-row"><b class="info-label">الصف</b><span class="info-line grade-slot"></span></div><div class="info-row"><b class="info-label">المدرسة</b><span class="info-line school-slot"></span></div></div><div class="child-photo-wrapper"><img class="child-photo" hidden alt="صورة الطالب"><span class="photo-placeholder">صورة الطالب</span></div></div></article>
+    <article class="sticker theme-english"><div class="sticker-header"><div class="subject-title"><svg class="subject-icon" viewBox="0 0 24 24"><path d="M4 17h2.5l1.2-3.5h4.6L13.5 17H16L10.8 3h-1.6L4 17zm4.4-5.6L10 6.5l1.6 4.9H8.4zM22 17h-2v-4.5c0-1.4-.7-2.1-1.9-2.1-.9 0-1.5.4-1.9 1.2V17h-2V7h2v3.7c.6-.8 1.5-1.3 2.5-1.3 1.9 0 3.3 1.2 3.3 3.4V17z"/></svg>اللغة الإنكليزية</div><span class="subject-tag">English ABC</span></div><div class="sticker-body"><div class="student-info"><div class="info-row"><b class="info-label">الاسم</b><span class="info-line name-slot"></span></div><div class="info-row"><b class="info-label">الصف</b><span class="info-line grade-slot"></span></div><div class="info-row"><b class="info-label">المدرسة</b><span class="info-line school-slot"></span></div></div><div class="child-photo-wrapper"><img class="child-photo" hidden alt="صورة الطالب"><span class="photo-placeholder">صورة الطالب</span></div></div></article>
+    <article class="sticker theme-math"><div class="sticker-header"><div class="subject-title"><svg class="subject-icon" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-6 2h5v2h-5V5zm-6 0h4v2H7V5zm2 5h2v2H9v-2zm-2 4h2v2H7v-2zm8 4h-2v-2h2v2zm0-4h-2v-2h2v2zm4 4h-2v-2h2v2zm0-4h-2v-2h2v2z"/></svg>الرياضيات</div><span class="subject-tag">حساب وأرقام</span></div><div class="sticker-body"><div class="student-info"><div class="info-row"><b class="info-label">الاسم</b><span class="info-line name-slot"></span></div><div class="info-row"><b class="info-label">الصف</b><span class="info-line grade-slot"></span></div><div class="info-row"><b class="info-label">المدرسة</b><span class="info-line school-slot"></span></div></div><div class="child-photo-wrapper"><img class="child-photo" hidden alt="صورة الطالب"><span class="photo-placeholder">صورة الطالب</span></div></div></article>
+    <article class="sticker theme-science"><div class="sticker-header"><div class="subject-title"><svg class="subject-icon" viewBox="0 0 24 24"><path d="M19.8 18.4L14 9V4h1c.55 0 1-.45 1-1s-.45-1-1-1H9c-.55 0-1 .45-1 1s.45 1 1 1h1v5L4.2 18.4C3.4 19.6 4.3 21 5.7 21h12.6c1.4 0 2.3-1.4 1.5-2.6zM7.1 18l3.9-6.3V4h2v7.7l3.9 6.3H7.1z"/></svg>العلوم</div><span class="subject-tag">مختبر ومجهر</span></div><div class="sticker-body"><div class="student-info"><div class="info-row"><b class="info-label">الاسم</b><span class="info-line name-slot"></span></div><div class="info-row"><b class="info-label">الصف</b><span class="info-line grade-slot"></span></div><div class="info-row"><b class="info-label">المدرسة</b><span class="info-line school-slot"></span></div></div><div class="child-photo-wrapper"><img class="child-photo" hidden alt="صورة الطالب"><span class="photo-placeholder">صورة الطالب</span></div></div></article>
+    <article class="sticker theme-social"><div class="sticker-header"><div class="subject-title"><svg class="subject-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg>الاجتماعيات</div><span class="subject-tag">مجتمع وهوية</span></div><div class="sticker-body"><div class="student-info"><div class="info-row"><b class="info-label">الاسم</b><span class="info-line name-slot"></span></div><div class="info-row"><b class="info-label">الصف</b><span class="info-line grade-slot"></span></div><div class="info-row"><b class="info-label">المدرسة</b><span class="info-line school-slot"></span></div></div><div class="child-photo-wrapper"><img class="child-photo" hidden alt="صورة الطالب"><span class="photo-placeholder">صورة الطالب</span></div></div></article>
+    <article class="sticker theme-art"><div class="sticker-header"><div class="subject-title"><svg class="subject-icon" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61.5.62 1.34.89 2.1.66.7-.22 1.18-.84 1.23-1.57.06-.88.8-1.55 1.68-1.55h1.02c3.31 0 6-2.69 6-6 0-4.42-3.58-8-7-8z"/></svg>التربية الفنية</div><span class="subject-tag">ألوان وفرش</span></div><div class="sticker-body"><div class="student-info"><div class="info-row"><b class="info-label">الاسم</b><span class="info-line name-slot"></span></div><div class="info-row"><b class="info-label">الصف</b><span class="info-line grade-slot"></span></div><div class="info-row"><b class="info-label">المدرسة</b><span class="info-line school-slot"></span></div></div><div class="child-photo-wrapper"><img class="child-photo" hidden alt="صورة الطالب"><span class="photo-placeholder">صورة الطالب</span></div></div></article>
+    <article class="sticker theme-geography"><div class="sticker-header"><div class="subject-title"><svg class="subject-icon" viewBox="0 0 24 24"><path d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"/></svg>الجغرافيا</div><span class="subject-tag">خرائط وأقطار</span></div><div class="sticker-body"><div class="student-info"><div class="info-row"><b class="info-label">الاسم</b><span class="info-line name-slot"></span></div><div class="info-row"><b class="info-label">الصف</b><span class="info-line grade-slot"></span></div><div class="info-row"><b class="info-label">المدرسة</b><span class="info-line school-slot"></span></div></div><div class="child-photo-wrapper"><img class="child-photo" hidden alt="صورة الطالب"><span class="photo-placeholder">صورة الطالب</span></div></div></article>
+    <article class="sticker theme-history"><div class="sticker-header"><div class="subject-title"><svg class="subject-icon" viewBox="0 0 24 24"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>التاريخ</div><span class="subject-tag">قصص وحضارات</span></div><div class="sticker-body"><div class="student-info"><div class="info-row"><b class="info-label">الاسم</b><span class="info-line name-slot"></span></div><div class="info-row"><b class="info-label">الصف</b><span class="info-line grade-slot"></span></div><div class="info-row"><b class="info-label">المدرسة</b><span class="info-line school-slot"></span></div></div><div class="child-photo-wrapper"><img class="child-photo" hidden alt="صورة الطالب"><span class="photo-placeholder">صورة الطالب</span></div></div></article>
+  </main>
+
+  <script>
+    const syncInput = (id, slot) => document.getElementById(id).addEventListener('input', event => {
+      document.querySelectorAll('.' + slot).forEach(el => el.textContent = event.target.value);
+    });
+    syncInput('nameInput', 'name-slot');
+    syncInput('gradeInput', 'grade-slot');
+    syncInput('schoolInput', 'school-slot');
+
+    document.getElementById('decorationMode').addEventListener('change', event => {
+      const page = document.getElementById('stickerPage');
+      page.classList.toggle('girls', event.target.value === 'girls');
+      page.classList.toggle('boys', event.target.value === 'boys');
+    });
+
+    document.getElementById('imageInput').addEventListener('change', event => {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ({ target }) => {
+        document.querySelectorAll('.child-photo').forEach(img => { img.src = target.result; img.hidden = false; });
+        document.querySelectorAll('.photo-placeholder').forEach(text => { text.hidden = true; });
+      };
+      reader.readAsDataURL(file);
+    });
+  </script>
+</body>
+</html>
