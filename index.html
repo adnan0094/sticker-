@@ -324,18 +324,29 @@
     });
 
     document.getElementById('sharePdf').addEventListener('click', async () => {
-      const file = await createPdfFile();
-      if (!file) return;
-      if (navigator.share && (!navigator.canShare || navigator.canShare({ files: [file] }))) {
-        await navigator.share({ title: 'ملصقات مدرسية', text: 'ملف الملصقات المدرسية', files: [file] });
-      } else {
+      try {
+        const file = await createPdfFile();
+        if (!file) return;
+        const canShareFile = navigator.share && (!navigator.canShare || navigator.canShare({ files: [file] }));
+        if (canShareFile) {
+          await navigator.share({ title: 'ملصقات مدرسية', text: 'ملف الملصقات المدرسية', files: [file] });
+          return;
+        }
+
+        // المتصفحات المكتبية أو فتح الملف بصيغة file:// لا تسمح بإرفاق ملف محلي لواتساب.
         const url = URL.createObjectURL(file);
         const link = document.createElement('a');
         link.href = url;
         link.download = file.name;
         link.click();
         setTimeout(() => URL.revokeObjectURL(url), 1000);
-        alert('المشاركة المباشرة غير مدعومة في هذا المتصفح، لذلك تم تنزيل ملف PDF.');
+        const whatsappUrl = 'https://wa.me/?text=' + encodeURIComponent('تم تجهيز ملف الملصقات المدرسية بصيغة PDF. أرفق الملف الذي تم تنزيله في هذه المحادثة.');
+        window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+        alert('تم تنزيل ملف PDF وفتح واتساب. أرفق الملف الذي تم تنزيله يدويًا، لأن هذا المتصفح لا يسمح بإرفاق الملفات تلقائيًا.');
+      } catch (error) {
+        if (error?.name !== 'AbortError') {
+          alert('تعذرت المشاركة. اضغط PDF أولًا لتنزيل الملف، ثم أرفقه في واتساب.');
+        }
       }
     });
 
