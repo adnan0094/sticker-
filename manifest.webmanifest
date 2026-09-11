@@ -1,0 +1,16 @@
+{
+  "name": "اشرب دوائك ولا تنسى",
+  "short_name": "منبه الدواء",
+  "description": "منبه دواء يومي مع تقويم متابعة الجرعات",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#071d2b",
+  "theme_color": "#155b60",
+  "icons": [
+    {"src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable"}
+  ]
+}

@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اشرب دوائك ولا تنسى</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 12px;
+            padding: 12px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .month-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            flex: 1;
+            text-align: center;
+        }
+
+        .nav-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 6px 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .nav-btn:hover {
+            background: #5568d3;
+        }
+
+        .weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            margin-bottom: 8px;
+        }
+
+        .weekday-name {
+            text-align: center;
+            font-weight: bold;
+            font-size: 11px;
+            color: #667eea;
+            padding: 4px;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            margin-bottom: 10px;
+        }
+
+        .day-cell {
+            aspect-ratio: 1;
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: bold;
+            font-size: 12px;
+            color: #333;
+            position: relative;
+            min-height: 40px;
+        }
+
+        .day-cell:hover:not(.empty) {
+            transform: scale(1.05);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .day-cell.today {
+            border: 2px solid #667eea;
+            background: #f0f4ff;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+        }
+
+        .day-cell.taken {
+            background: #4caf50;
+            color: white;
+            border-color: #45a049;
+        }
+
+        .day-cell.taken::after {
+            content: '✓';
+            position: absolute;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .day-cell.empty {
+            background: transparent;
+            border: none;
+            cursor: default;
+        }
+
+        .day-cell.empty:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .stats {
+            display: flex;
+            gap: 8px;
+            padding: 8px;
+            background: #f9f9f9;
+            border-radius: 6px;
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+
+        .stat {
+            flex: 1;
+            text-align: center;
+        }
+
+        .stat-num {
+            font-size: 14px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 10px;
+            margin-top: 2px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+
+        .control-btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 11px;
+            transition: all 0.3s;
+        }
+
+        .reset-btn {
+            background: #f44336;
+            color: white;
+        }
+
+        .reset-btn:hover {
+            background: #d32f2f;
+        }
+
+        .today-btn {
+            background: #4caf50;
+            color: white;
+        }
+
+        .today-btn:hover {
+            background: #45a049;
+        }
+
+        .notification-btn {
+            background: #ff9800;
+            color: white;
+        }
+
+        .notification-btn:hover {
+            background: #e68900;
+        }
+
+        .notification-btn.active {
+            background: #2196f3;
+        }
+
+        .notification-settings {
+            background: #f9f9f9;
+            border-radius: 6px;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+        }
+
+        .app-nav { display: flex; gap: 6px; margin-bottom: 10px; }
+        .page-nav-btn { flex: 1; padding: 8px; border: 0; border-radius: 6px; background: #eef0f8; color: #596174; cursor: pointer; font-size: 12px; font-weight: bold; }
+        .page-nav-btn.active { background: #667eea; color: white; }
+        .page { display: none; }
+        .page.active { display: block; }
+        .page-title { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; color: #333; font-size: 16px; font-weight: bold; }
+        .back-btn { border: 0; border-radius: 5px; padding: 5px 8px; background: #eef0f8; color: #5266d8; cursor: pointer; }
+        .alarm-card { padding: 12px; background: #f9f9f9; border: 1px solid #ddd; border-radius: 8px; }
+        .alarm-card .time-input-group { padding: 8px 0; border-bottom: 1px solid #e8e8e8; }
+        .alarm-card .time-input-group:last-of-type { border-bottom: 0; }
+        .alarm-modal { display: none; position: fixed; inset: 0; z-index: 50; align-items: center; justify-content: center; padding: 18px; background: rgba(24, 30, 55, .58); }
+        .alarm-modal.open { display: flex; }
+        .alarm-modal-card { width: 100%; max-width: 330px; padding: 24px 18px 18px; border-radius: 16px; background: white; box-shadow: 0 15px 45px rgba(0,0,0,.28); text-align: center; }
+        .alarm-modal-icon { font-size: 42px; margin-bottom: 8px; }
+        .alarm-modal-card h2 { margin-bottom: 8px; color: #333; font-size: 20px; }
+        .alarm-modal-card p { margin-bottom: 18px; color: #666; font-size: 13px; line-height: 1.7; }
+        .taken-btn { width: 100%; padding: 12px; border: 0; border-radius: 8px; background: #4caf50; color: white; cursor: pointer; font-size: 14px; font-weight: bold; }
+        .taken-btn:hover { background: #388e3c; }
+        .later-btn { width: 100%; margin-top: 8px; padding: 9px; border: 0; background: transparent; color: #777; cursor: pointer; font-size: 12px; }
+
+        .settings-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+        .more-menu-wrap { position: relative; }
+        .more-btn { width: 30px; height: 30px; border: 0; border-radius: 50%; background: #eceffd; color: #5266d8; cursor: pointer; font-size: 20px; line-height: 20px; letter-spacing: 2px; }
+        .more-btn:hover { background: #dfe4ff; }
+        .more-menu { display: none; position: absolute; z-index: 10; top: 36px; right: 0; width: 190px; padding: 6px; background: white; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 8px 22px rgba(0,0,0,.18); }
+        .more-menu.open { display: block; }
+        .more-menu button { display: block; width: 100%; padding: 9px 10px; border: 0; border-radius: 5px; background: transparent; color: #333; cursor: pointer; text-align: right; font-size: 12px; }
+        .more-menu button:hover { background: #f0f3ff; color: #5266d8; }
+        .sound-row input[type="file"] { width: 1px; height: 1px; opacity: 0; position: absolute; pointer-events: none; }
+        .sound-picker-btn { padding: 5px 10px; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 11px; }
+        .sound-name { display: block; margin-top: 5px; color: #666; font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        .time-input-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+
+        .time-input-group label {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .time-input-group input {
+            padding: 5px 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 12px;
+            width: 100px;
+        }
+
+        .time-input-group button {
+            padding: 5px 10px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            transition: background 0.3s;
+        }
+
+        .time-input-group button:hover {
+            background: #5568d3;
+        }
+
+        .notification-status {
+            font-size: 11px;
+            color: #666;
+            padding: 5px;
+            background: white;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .notification-status.enabled {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .notification-status.disabled {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        /* الهوية الفاخرة */
+        body {
+            font-family: Tahoma, 'Segoe UI', sans-serif;
+            background: radial-gradient(circle at 15% 10%, #2d6a68 0, transparent 36%), linear-gradient(145deg, #071d2b, #123c4a 55%, #0b2635);
+            padding: 18px;
+        }
+        .container {
+            max-width: 430px;
+            padding: 18px;
+            border: 1px solid rgba(255,255,255,.3);
+            border-radius: 24px;
+            background: rgba(250, 253, 252, .97);
+            box-shadow: 0 24px 70px rgba(0,0,0,.38);
+        }
+        .brand-header { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+        .brand-mark { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 15px; background: linear-gradient(135deg, #c9a96e, #f3d99b); color: #173d43; font-size: 27px; box-shadow: 0 7px 18px rgba(184,145,75,.28); }
+        .brand-header h1 { color: #123b43; font-size: 20px; letter-spacing: -.4px; }
+        .brand-header p { margin-top: 3px; color: #789092; font-size: 11px; }
+        .app-nav { padding: 4px; border-radius: 12px; background: #e8f0ed; }
+        .page-nav-btn { padding: 10px; border-radius: 9px; transition: .2s; }
+        .page-nav-btn.active { background: linear-gradient(135deg, #155b60, #237d78); box-shadow: 0 5px 12px rgba(21,91,96,.2); }
+        .month-title { color: #153f47; font-size: 17px; }
+        .nav-btn { background: #155b60; border-radius: 10px; padding: 8px 12px; }
+        .weekdays { gap: 5px; }
+        .weekday-name { color: #9a7a42; font-size: 10px; }
+        .calendar-grid { gap: 5px; }
+        .day-cell { min-height: 42px; background: #f2f6f4; border-color: #d9e5e0; border-radius: 10px; color: #24484c; }
+        .day-cell.today { border-color: #c39b5b; background: #fff9ed; box-shadow: 0 0 0 3px rgba(195,155,91,.12); }
+        .day-cell.taken { background: linear-gradient(135deg, #328d7d, #1b665f); border-color: #28786e; }
+        .stats { padding: 12px 8px; border: 1px solid #e1ebe7; border-radius: 13px; background: #f5f9f7; }
+        .stat-num { color: #16646a; font-size: 17px; }
+        .stat-label { color: #809496; }
+        .control-btn, .time-input-group button, .sound-picker-btn { border-radius: 8px; padding: 8px 12px; font-weight: bold; }
+        .today-btn { background: #1b756e; }
+        .reset-btn { background: #b45c59; }
+        .notification-btn { background: #b58a4d; }
+        .notification-btn.active { background: #1b756e; }
+        .page-title { color: #153f47; font-size: 18px; }
+        .back-btn { background: #e8f0ed; }
+        .alarm-card { padding: 16px; border: 1px solid #dce9e4; border-radius: 16px; background: linear-gradient(145deg, #fbfdfc, #f0f6f3); box-shadow: 0 10px 25px rgba(31,82,75,.07); }
+        .more-btn { background: #e7f0ed; color: #17636a; }
+        .notification-status { padding: 9px; border-radius: 8px; }
+        .alarm-modal-card { border: 1px solid #ead8b8; border-radius: 20px; }
+        .alarm-modal-icon { color: #b58a4d; }
+        .taken-btn { background: linear-gradient(135deg, #1b756e, #2c9885); border-radius: 10px; }
+
+        @media (max-width: 500px) {
+            .container {
+                max-width: 100%;
+                padding: 10px;
+            }
+
+            .month-title {
+                font-size: 14px;
+            }
+
+            .day-cell {
+                font-size: 11px;
+                min-height: 35px;
+            }
+
+            .time-input-group {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .time-input-group input {
+                width: 100%;
+            }
+        }
+    </style>
+    <link rel="manifest" href="manifest.webmanifest">
+    <meta name="theme-color" content="#155b60">
+</head>
+<body>
+    <div class="container">
+        <header class="brand-header">
+            <div class="brand-mark">✦</div>
+            <div>
+                <h1>اشرب دوائك ولا تنسى</h1>
+                <p>رفيقك اليومي لصحة أفضل</p>
+            </div>
+        </header>
+        <div class="app-nav">
+            <button class="page-nav-btn active" id="calendarTab" onclick="showPage('calendarPage')">📅 التقويم</button>
+            <button class="page-nav-btn" id="alarmTab" onclick="showPage('alarmPage')">⏰ المنبه</button>
+        </div>
+
+        <section class="page active" id="calendarPage">
+        <div class="header">
+            <button class="nav-btn" onclick="previousMonth()">❮</button>
+            <div class="month-title" id="monthTitle"></div>
+            <button class="nav-btn" onclick="nextMonth()">❯</button>
+        </div>
+
+        <div class="weekdays" id="weekdays"></div>
+        <div class="calendar-grid" id="calendarGrid"></div>
+
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-num" id="takenCount">0</div>
+                <div class="stat-label">أخذت</div>
+            </div>
+            <div class="stat">
+                <div class="stat-num" id="notTakenCount">0</div>
+                <div class="stat-label">لم آخذ</div>
+            </div>
+            <div class="stat">
+                <div class="stat-num" id="percentage">0%</div>
+                <div class="stat-label">النسبة</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="control-btn today-btn" onclick="goToToday()">اليوم</button>
+            <button class="control-btn reset-btn" onclick="resetMonth()">حذف</button>
+        </div>
+        </section>
+
+        <section class="page" id="alarmPage">
+            <div class="page-title"><button class="back-btn" onclick="showPage('calendarPage')">رجوع</button>⏰ إعداد المنبه</div>
+            <div class="alarm-card">
+            <div class="settings-header">
+                <div style="font-weight: bold; color: #333; font-size: 13px;">منبه الدواء اليومي</div>
+                <div class="more-menu-wrap">
+                    <button class="more-btn" aria-label="خيارات المنبه" onclick="toggleMoreMenu(event)">•••</button>
+                    <div class="more-menu" id="moreMenu">
+                        <button onclick="showAlarmOptions()">⚙️ خيارات المنبه</button>
+                        <button onclick="testNotification()">🔊 تجربة النغمة</button>
+                        <button onclick="toggleNotifications(); closeMoreMenu()">🔔 تفعيل/تعطيل التنبيه</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="time-input-group">
+                <label for="notificationTime">وقت التنبيه:</label>
+                <input type="time" id="notificationTime" value="08:00">
+            </div>
+
+            <div class="time-input-group">
+                <label for="repeatCount">عدد مرات التنبيه:</label>
+                <input type="number" id="repeatCount" value="1" min="1" max="10" style="width: 70px;">
+            </div>
+
+            <div class="time-input-group sound-row">
+                <label for="soundFile">نغمة التنبيه:</label>
+                <button class="sound-picker-btn" onclick="document.getElementById('soundFile').click()">اختيار من الجوال</button>
+                <input type="file" id="soundFile" accept="audio/*" onchange="selectAlarmSound(event)">
+            </div>
+            <span class="sound-name" id="soundName">النغمة الافتراضية</span>
+
+            <div class="notification-status" id="notificationStatus">
+                🔔 التنبيهات معطّلة
+            </div>
+            <button class="control-btn notification-btn" id="toggleNotificationBtn" onclick="toggleNotifications()" style="width:100%; margin-top:10px;">🔔 تفعيل التنبيهات</button>
+            <button class="control-btn today-btn" onclick="saveAlarmSettings()" style="width:100%; margin-top:8px;">💾 حفظ إعدادات المنبه</button>
+            </div>
+        </section>
+    </div>
+
+    <div class="alarm-modal" id="alarmModal" role="dialog" aria-modal="true" aria-labelledby="alarmModalTitle">
+        <div class="alarm-modal-card">
+            <div class="alarm-modal-icon">⏰</div>
+            <h2 id="alarmModalTitle">حان وقت الدواء</h2>
+            <p>هل شربت دواء اليوم؟ اضغط على الزر بعد تناول الدواء لتسجيله في التقويم.</p>
+            <button class="taken-btn" onclick="markTodayTaken()">✅ نعم، شربت الدواء اليوم</button>
+            <button class="later-btn" onclick="closeAlarmModal()">لاحقًا</button>
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'medicineCalendar';
+        const NOTIFICATION_SETTINGS_KEY = 'notificationSettings';
+        const MONTHS_AR = [
+            'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
+            'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
+        ];
+        const DAYS_AR = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+
+        let currentDate = new Date();
+        let notificationEnabled = false;
+        let notificationInterval = null;
+
+        // الحصول على بيانات التخزين
+        function getData() {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            return stored ? JSON.parse(stored) : {};
+        }
+
+        // حفظ البيانات
+        function saveData(data) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        }
+
+        // الحصول على إعدادات التنبيهات
+        function getNotificationSettings() {
+            const stored = localStorage.getItem(NOTIFICATION_SETTINGS_KEY);
+            return stored ? JSON.parse(stored) : {
+                enabled: false,
+                time: '08:00',
+                repeatCount: 1,
+                soundName: '',
+                soundData: ''
+            };
+        }
+
+        // حفظ إعدادات التنبيهات
+        function saveNotificationSettings(settings) {
+            localStorage.setItem(NOTIFICATION_SETTINGS_KEY, JSON.stringify(settings));
+        }
+
+        // الحصول على مفتاح اليوم
+        function getDayKey(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        let alarmAudio = null;
+        let alarmAudioContext = null;
+        let alarmAudioTimeout = null;
+        let pendingSoundName = '';
+        let pendingSoundData = '';
+        let lastTriggeredKey = '';
+
+        // تشغيل جرس التنبيه لمدة 10 ثوانٍ كحد أقصى
+        function stopNotificationSound() {
+            if (alarmAudioTimeout) {
+                clearTimeout(alarmAudioTimeout);
+                alarmAudioTimeout = null;
+            }
+            if (alarmAudio) {
+                alarmAudio.pause();
+                alarmAudio.currentTime = 0;
+                alarmAudio = null;
+            }
+            if (alarmAudioContext) {
+                alarmAudioContext.close().catch(() => {});
+                alarmAudioContext = null;
+            }
+        }
+
+        function playNotificationSound() {
+            stopNotificationSound();
+            try {
+                const settings = getNotificationSettings();
+                if (settings.soundData) {
+                    alarmAudio = new Audio(settings.soundData);
+                    alarmAudio.volume = 1;
+                    alarmAudio.loop = true;
+                    alarmAudio.play().catch(() => console.log('اضغط تجربة النغمة للسماح بتشغيل الصوت'));
+                    alarmAudioTimeout = setTimeout(stopNotificationSound, 10000);
+                    return;
+                }
+
+                // جرس افتراضي متكرر لمدة 10 ثوانٍ
+                alarmAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const audioContext = alarmAudioContext;
+                const startedAt = audioContext.currentTime;
+                const ringBell = () => {
+                    const now = audioContext.currentTime;
+                    if (now - startedAt >= 10) {
+                        audioContext.close();
+                        return;
+                    }
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    oscillator.frequency.setValueAtTime(880, now);
+                    oscillator.frequency.exponentialRampToValueAtTime(620, now + 0.35);
+                    oscillator.type = 'sine';
+                    gainNode.gain.setValueAtTime(0.001, now);
+                    gainNode.gain.exponentialRampToValueAtTime(0.35, now + 0.02);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.55);
+                    oscillator.start(now);
+                    oscillator.stop(now + 0.6);
+                    alarmAudioTimeout = setTimeout(ringBell, 850);
+                };
+                ringBell();
+                alarmAudioTimeout = setTimeout(stopNotificationSound, 10000);
+            } catch (e) {
+                console.log('خطأ في تشغيل الصوت:', e);
+            }
+        }
+
+        // عرض إشعار التنبيه
+        function showNotification() {
+            const today = new Date();
+            const dayKey = getDayKey(today);
+            const data = getData();
+            const isTakenToday = data[dayKey] || false;
+
+            if (!isTakenToday) {
+                // طلب إذن الإشعارات
+                if ('Notification' in window) {
+                    if (Notification.permission === 'granted') {
+                        displayNotification();
+                    } else if (Notification.permission !== 'denied') {
+                        Notification.requestPermission().then(permission => {
+                            if (permission === 'granted') {
+                                displayNotification();
+                            }
+                        });
+                    }
+                }
+
+                showAlarmModal();
+
+                // تشغيل الصوت
+                playNotificationSound();
+            }
+        }
+
+        function displayNotification() {
+            const settings = getNotificationSettings();
+            new Notification('🔔 تنبيه الدواء', {
+                body: 'لا تنسَ أن تأخذ دواءك الآن!',
+                icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="%23667eea"></circle><text x="50" y="60" font-size="50" text-anchor="middle" fill="white">💊</text></svg>',
+                tag: 'medicine-reminder',
+                requireInteraction: true
+            });
+        }
+
+        function showAlarmModal() {
+            document.getElementById('alarmModal').classList.add('open');
+        }
+
+        function closeAlarmModal() {
+            document.getElementById('alarmModal').classList.remove('open');
+            stopNotificationSound();
+        }
+
+        function markTodayTaken() {
+            const data = getData();
+            data[getDayKey(new Date())] = true;
+            saveData(data);
+            closeAlarmModal();
+            showPage('calendarPage');
+            renderCalendar();
+        }
+
+        // تفعيل/تعطيل التنبيهات
+        function toggleNotifications() {
+            const settings = getNotificationSettings();
+            settings.enabled = !settings.enabled;
+            saveNotificationSettings(settings);
+            notificationEnabled = settings.enabled;
+
+            updateNotificationUI();
+
+            if (settings.enabled) {
+                startNotificationService();
+            } else {
+                stopNotificationService();
+            }
+        }
+
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            document.getElementById('calendarTab').classList.toggle('active', pageId === 'calendarPage');
+            document.getElementById('alarmTab').classList.toggle('active', pageId === 'alarmPage');
+            closeMoreMenu();
+        }
+
+        function toggleMoreMenu(event) {
+            event.stopPropagation();
+            document.getElementById('moreMenu').classList.toggle('open');
+        }
+
+        function closeMoreMenu() {
+            document.getElementById('moreMenu').classList.remove('open');
+        }
+
+        function showAlarmOptions() {
+            closeMoreMenu();
+            document.getElementById('notificationTime').focus();
+        }
+
+        function testNotification() {
+            closeMoreMenu();
+            playNotificationSound();
+        }
+
+        function selectAlarmSound(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = () => {
+                pendingSoundName = file.name;
+                pendingSoundData = reader.result;
+                document.getElementById('soundName').textContent = `🎵 ${file.name} (غير محفوظ)`;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        document.addEventListener('click', event => {
+            if (!event.target.closest('.more-menu-wrap')) closeMoreMenu();
+        });
+
+        // بدء خدمة التنبيهات
+        function startNotificationService() {
+            if (notificationInterval) clearInterval(notificationInterval);
+
+            // فحص الوقت باستمرار لضمان تكرار التنبيه يوميًا في نفس الوقت
+            notificationInterval = setInterval(() => {
+                const settings = getNotificationSettings();
+                const now = new Date();
+                const currentTime = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+                const triggerKey = `${getDayKey(now)}-${currentTime}`;
+
+                if (currentTime === settings.time && lastTriggeredKey !== triggerKey) {
+                    lastTriggeredKey = triggerKey;
+                    for (let i = 0; i < settings.repeatCount; i++) {
+                        setTimeout(() => {
+                            showNotification();
+                        }, i * 5000); // تأخير 5 ثوان بين كل تنبيه
+                    }
+                }
+            }, 10000); // التحقق كل 10 ثوانٍ، مع منع التكرار في الدقيقة نفسها
+        }
+
+        // إيقاف خدمة التنبيهات
+        function stopNotificationService() {
+            if (notificationInterval) {
+                clearInterval(notificationInterval);
+                notificationInterval = null;
+            }
+        }
+
+        // تحديث واجهة التنبيهات
+        function updateNotificationUI() {
+            const settings = getNotificationSettings();
+            const btn = document.getElementById('toggleNotificationBtn');
+            const status = document.getElementById('notificationStatus');
+            const timeInput = document.getElementById('notificationTime');
+            const repeatInput = document.getElementById('repeatCount');
+
+            timeInput.value = settings.time;
+            repeatInput.value = settings.repeatCount;
+            if (!pendingSoundData) {
+                document.getElementById('soundName').textContent = settings.soundName ? `🎵 ${settings.soundName}` : 'النغمة الافتراضية';
+            }
+
+            if (settings.enabled) {
+                btn.classList.add('active');
+                btn.textContent = '🔔 التنبيهات مفعّلة';
+                status.classList.remove('disabled');
+                status.classList.add('enabled');
+                status.textContent = `✅ يوميًا في ${settings.time}`;
+            } else {
+                btn.classList.remove('active');
+                btn.textContent = '🔔 تفعيل التنبيهات';
+                status.classList.remove('enabled');
+                status.classList.add('disabled');
+                status.textContent = '❌ التنبيهات معطّلة';
+            }
+        }
+
+        // حفظ جميع إعدادات المنبه من زر واحد أسفل الشاشة
+        function saveAlarmSettings() {
+            const settings = getNotificationSettings();
+            const timeValue = document.getElementById('notificationTime').value;
+            const repeatValue = parseInt(document.getElementById('repeatCount').value, 10);
+            settings.time = timeValue || '08:00';
+            settings.repeatCount = Number.isFinite(repeatValue) ? Math.min(10, Math.max(1, repeatValue)) : 1;
+            if (pendingSoundData) {
+                settings.soundName = pendingSoundName;
+                settings.soundData = pendingSoundData;
+            }
+            saveNotificationSettings(settings);
+            pendingSoundName = '';
+            pendingSoundData = '';
+            updateNotificationUI();
+            if (settings.enabled) {
+                stopNotificationService();
+                startNotificationService();
+            }
+        }
+
+        // تبديل حالة اليوم
+        function toggleDay(day) {
+            if (day === null) return;
+            const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+            const key = getDayKey(date);
+            const data = getData();
+            data[key] = !data[key];
+            saveData(data);
+            renderCalendar();
+        }
+
+        // عرض التقويم
+        function renderCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            const monthTitle = document.getElementById('monthTitle');
+            const grid = document.getElementById('calendarGrid');
+
+            monthTitle.textContent = `${MONTHS_AR[month]} ${year}`;
+            grid.innerHTML = '';
+
+            const data = getData();
+            const today = getDayKey(new Date());
+            
+            let takenCount = 0;
+            let totalDays = 0;
+
+            const firstDay = new Date(year, month, 1);
+            const firstDayOfWeek = firstDay.getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            for (let i = 0; i < firstDayOfWeek; i++) {
+                const emptyCell = document.createElement('div');
+                emptyCell.className = 'day-cell empty';
+                grid.appendChild(emptyCell);
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const date = new Date(year, month, day);
+                const key = getDayKey(date);
+                const isTaken = data[key] || false;
+                const isToday = key === today;
+
+                const cell = document.createElement('div');
+                cell.className = 'day-cell';
+                cell.textContent = day;
+
+                if (isToday) {
+                    cell.classList.add('today');
+                }
+
+                if (isTaken) {
+                    cell.classList.add('taken');
+                    takenCount++;
+                }
+
+                cell.onclick = () => toggleDay(day);
+                grid.appendChild(cell);
+                totalDays++;
+            }
+
+            const notTaken = totalDays - takenCount;
+            const percentage = totalDays > 0 ? Math.round((takenCount / totalDays) * 100) : 0;
+
+            document.getElementById('takenCount').textContent = takenCount;
+            document.getElementById('notTakenCount').textContent = notTaken;
+            document.getElementById('percentage').textContent = percentage + '%';
+        }
+
+        // عرض أسماء الأيام
+        function renderWeekdays() {
+            const weekdaysDiv = document.getElementById('weekdays');
+            weekdaysDiv.innerHTML = '';
+            
+            DAYS_AR.forEach(day => {
+                const dayEl = document.createElement('div');
+                dayEl.className = 'weekday-name';
+                dayEl.textContent = day;
+                weekdaysDiv.appendChild(dayEl);
+            });
+        }
+
+        // الشهر السابق
+        function previousMonth() {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar();
+        }
+
+        // الشهر التالي
+        function nextMonth() {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar();
+        }
+
+        // الذهاب إلى اليوم
+        function goToToday() {
+            currentDate = new Date();
+            renderCalendar();
+        }
+
+        // حذف بيانات الشهر الحالي
+        function resetMonth() {
+            if (confirm(`هل تريد حذف بيانات ${MONTHS_AR[currentDate.getMonth()]}؟`)) {
+                const data = getData();
+                const year = currentDate.getFullYear();
+                const month = currentDate.getMonth();
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const date = new Date(year, month, day);
+                    const key = getDayKey(date);
+                    delete data[key];
+                }
+
+                saveData(data);
+                renderCalendar();
+            }
+        }
+
+        // تسجيل النسخة القابلة للتثبيت والعمل دون اتصال
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js'));
+        }
+
+        // تهيئة التطبيق
+        window.addEventListener('load', () => {
+            renderWeekdays();
+            renderCalendar();
+            
+            const settings = getNotificationSettings();
+            notificationEnabled = settings.enabled;
+            updateNotificationUI();
+
+            if (settings.enabled) {
+                startNotificationService();
+            }
+        });
+
+        // إيقاف النغمة فور العودة إلى التطبيق، وكذلك إيقاف المؤقت عند إغلاق الصفحة
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) stopNotificationSound();
+        });
+
+        window.addEventListener('beforeunload', () => {
+            stopNotificationService();
+            stopNotificationSound();
+        });
+    </script>
+</body>
+</html>
